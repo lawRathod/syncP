@@ -1,23 +1,18 @@
 import threading
 import socket
 from player import player
-# print("Enter host: ")
-# host = input()
 
-# print("Enter Port:")
-# port = int(input())
-
-# host = socket.gethostbyname(host)
 
 class sock:
-    def __init__(self, port):
+    def __init__(self, port, host):
         self.port = port
+        self.host = host
 
     def start(self):
         try:
             s = socket.socket()
             print("socket created")
-            s.connect(('127.0.0.1', self.port))
+            s.connect((self.host, self.port))
             print(s.recv(1024).decode())
             return s
         except Exception as e:
@@ -39,9 +34,16 @@ def playing(p, conn):
 
 
 if __name__ == "__main__":
+    print("Enter host url: ")
+    host = input()
+
+    print("Enter Port: ")
+    port = int(input())
+
+
     try:
         p = player()
-        s = sock(3000)
+        s = sock(port, host)
         conn = s.start()
         if conn==None:
             raise EOFError
