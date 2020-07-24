@@ -29,6 +29,8 @@ def playing(p, conn):
             p.quit()
         elif data=="":
             break
+        elif data.find("sync: ") == 0:
+            p.player.seek(data[6:],reference="absolute")
 
     print("thread completed")
 

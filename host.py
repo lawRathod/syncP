@@ -1,3 +1,4 @@
+import time
 import socket
 import threading
 from player import player
@@ -23,6 +24,15 @@ class sock:
         except Exception as e:
             print(e)
 
+def keepAlive(conn):
+    while 1:
+        data = conn.recv(1024).decode()
+        if data=="":
+            break
+        conn.send("keepAlive".encode())
+        time.sleep(120)
+
+
 def playing(p, conn):
     print("thread created successfullyy")
     while 1:
@@ -42,8 +52,10 @@ if __name__ == "__main__":
         p = player()
         s = sock(3000)
         sock, conn = s.start()
+        ka = threading.Thread(target=keepAlive, args=(conn,))
         t = threading.Thread(target=playing, args=(p, conn,))
         try:
+            ka.start()
             t.start()
             p.start(conn)
         except Exception as e:
