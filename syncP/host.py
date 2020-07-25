@@ -10,7 +10,7 @@ class sock:
     def start(self):
         try:
             s = socket.socket()
-            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
             print("socket created")
             s.bind(('', self.port))
             print("socket binded")
@@ -26,46 +26,44 @@ class sock:
 
 def keepAlive(conn):
     while 1:
-        data = conn.recv(1024).decode()
-        if data=="":
-            break
-        conn.send("keepAlive".encode())
-        time.sleep(120)
+        try:
+            conn.send("check".encode())
+            time.sleep(60)
+        except Exception as e:
+            print(e)
+            return
 
 
 def playing(p, conn):
     print("thread created successfullyy")
     while 1:
         data = conn.recv(1024).decode()
-        print(data)
         if data=="toggle":
             p.toggle()
-        elif data=="quit":
-            p.quit()
         elif data=="":
+            p.quit()
             break
 
     print("thread completed")
 
-if __name__ == "__main__":
+def run():
     try:
         p = player()
         s = sock(3000)
-        sock, conn = s.start()
+        s, conn = s.start()
         ka = threading.Thread(target=keepAlive, args=(conn,))
         t = threading.Thread(target=playing, args=(p, conn,))
+        ka.start()
         try:
-            ka.start()
             t.start()
             p.start(conn)
         except Exception as e:
             print(e)
         conn.close()
-        sock.close()
+        s.close()
         print("App Closed!")
     except Exception as e:
-        print(e)
-
+        raise e
 
 
 
