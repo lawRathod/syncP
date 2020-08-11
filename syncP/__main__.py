@@ -1,5 +1,5 @@
 import sys
-import host, client, testmpv
+from syncP import host, client, testmpv
 
 def main(opt):
     if opt=="host":
@@ -12,9 +12,12 @@ def main(opt):
         print("use host/client/test as a parameter")
 
 
-if __name__ == "__main__":
+def run():
     args = sys.argv
     if len(args)==2:
         main(args[1])
     else:
         print("Pass host/client/test as a parameter")
+
+if __name__=="__main__":
+    run()

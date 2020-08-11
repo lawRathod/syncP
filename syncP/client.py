@@ -1,12 +1,13 @@
 import threading
 import os
 import socket
-from player import player
+import inspect
+from syncP.player import player
 
 
 class sock:
     def __init__(self, port, host):
-        self.port = port
+        self.port = int(port)
         self.host = host
 
     def start(self):
@@ -34,32 +35,39 @@ def playing(p, conn):
     print("thread completed")
 
 def config():
-    # os.system('cls' if os.name == 'nt' else 'clear')
-    if "config" in os.listdir():
-        print("Use last entered config? [Y/n]")
+    own_path=inspect.getfile(player)[:-9]
+    config_path = os.path.join(own_path, 'config')
+    if "config" in os.listdir(own_path):
         host = None
         port = None
+        temp = None
+        with open(config_path, 'r') as f:
+                temp = f.read().split("~")
+                print("\nLast Config Stored: ")
+                print("Host: "+temp[0])
+                print("Port: "+temp[1])
+        print("\n\nUse last entered config? [Y/n]")
         s = input()
         s = s.lower()
-        if s=="\n" or s=="y":
-            with open("config", 'r') as f:
-                temp = f.read().split("~")
-                host, port = temp[0], temp[1]
+        if s=="" or s=="y":
+            host, port = temp[0], temp[1]
         else:
+            os.system('cls' if os.name == 'nt' else 'clear')
             print("Enter host url: ")
             host = input()
             print("Enter Port: ")
             port = int(input())
 
-            with open("config", 'w') as f:
+            with open(config_path, 'w') as f:
                 f.write(host+"~"+str(port))
     else:
+        os.system('cls' if os.name == 'nt' else 'clear')
         print("Enter host url: ")
         host = input()
         print("Enter Port: ")
         port = int(input())
 
-        with open("config", 'w') as f:
+        with open(config_path, 'w') as f:
             f.write(host+"~"+str(port))
 
 
@@ -79,9 +87,12 @@ def run():
             t.start()
             p.start(conn)
         except Exception as e:
-            print(e)
+            raise e
         conn.close()
         print("App Closed!")
     except Exception as e:
-        print(e)
+        raise e
+
+if __name__ == "__main__":
+    run()
 
