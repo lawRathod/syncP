@@ -2,6 +2,7 @@ import time
 import socket
 import threading
 from syncP.player import player
+import sys
 
 class sock:
     def __init__(self, port):
@@ -47,10 +48,10 @@ def playing(p, conn):
 
     print("thread completed")
 
-def run():
+def run(port=3456):
     try:
         p = player()
-        s = sock(3099)
+        s = sock(port)
         s, conn = s.start()
         ka = threading.Thread(target=keepAlive, args=(conn,))
         t = threading.Thread(target=playing, args=(p, conn,))
@@ -69,7 +70,12 @@ def run():
 
 
 if __name__ == "__main__":
-    run()
+    args = sys.argv
+    port = 3456
+    if(args[2]=="--port"):
+        if int(args[3]) in range(1000,10000):
+            port = int(args[3])
+    run(port)
 
 
 
