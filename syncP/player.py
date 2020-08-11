@@ -1,6 +1,5 @@
-import mpv
 import os
-
+from syncP import mpv
 
 class player:
     def __init__(self):
@@ -19,16 +18,20 @@ class player:
             conn.send("quit".encode())
             self.quit()
 
-        @player.on_key_press("s")
-        def on_sync():
-            payload = "sync: "+str(self.curr_time)
-            conn.send(payload.encode())
-
         @player.on_key_press("space")
         def on_toggle():
             conn.send("toggle".encode())
             self.toggle()
 
+
+        @player.on_key_press("s")
+        def on_sync():
+            payload = "sync: "+str(self.curr_time)
+            conn.send(payload.encode())
+
+
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print("Now Playing \n"+os.path.basename(self.selected)+"...")
         self.player.play(self.selected)
         self.player.wait_for_playback()
 
@@ -40,10 +43,12 @@ class player:
         self.player.cycle("pause")
 
     def selectMedia(self):
+        os.system('cls' if os.name == 'nt' else 'clear')
         files = os.listdir('.')
+        print("List of files in this directory:\n\n")
         for i in range(len(files)):
             print('['+str(i)+'] '+files[i])
-        print("Enter the file number to select: ")
+        print("\n\nEnter the file number to select: ")
 
         return os.path.abspath(files[int(input())])
 
