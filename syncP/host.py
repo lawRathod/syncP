@@ -26,14 +26,6 @@ class sock:
         except Exception as e:
             print(e)
 
-def keepAlive(conn):
-    while 1:
-        try:
-            conn.send("check".encode())
-            time.sleep(60)
-        except Exception as e:
-            print(e)
-            return
 
 
 def playing(p, conn):
@@ -53,7 +45,6 @@ def run(port=3456):
         p = player()
         s = sock(port)
         s, conn = s.start()
-        ka = threading.Thread(target=keepAlive, args=(conn,))
         t = threading.Thread(target=playing, args=(p, conn,))
         ka.start()
         try:
