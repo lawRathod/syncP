@@ -10,7 +10,7 @@ A tool to sync mpv player between host and clients. Great help from [jaseg/pytho
 
 ### Steps
 
-Install the wheel package manually by downloading it from [releases](https://github.com) or using **pip install syncP**.
+Install the wheel package manually by downloading it from [releases](https://github.com/lawRathod/syncP/releases/download/v0.1-alpha/syncP_lawRathod-0.0.1-py3-none-any.whl) or using **pip install syncP**.
 
 [For Windows]
 - You will need to download the libmpv zip from [Official Mpv Project](https://sourceforge.net/projects/mpv-player-windows/files/libmpv/), please use the lastest 32 bit version of libmpv.
