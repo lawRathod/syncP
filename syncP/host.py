@@ -1,7 +1,8 @@
 import time
 import socket
 import threading
-from player import player
+from syncP.player import player
+import sys
 
 class sock:
     def __init__(self, port):
@@ -11,6 +12,7 @@ class sock:
         try:
             s = socket.socket()
             s.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             print("socket created")
             s.bind(('', self.port))
             print("socket binded")
@@ -24,14 +26,6 @@ class sock:
         except Exception as e:
             print(e)
 
-def keepAlive(conn):
-    while 1:
-        try:
-            conn.send("check".encode())
-            time.sleep(60)
-        except Exception as e:
-            print(e)
-            return
 
 
 def playing(p, conn):
@@ -46,12 +40,11 @@ def playing(p, conn):
 
     print("thread completed")
 
-def run():
+def run(port=3456):
     try:
         p = player()
-        s = sock(3000)
+        s = sock(port)
         s, conn = s.start()
-        ka = threading.Thread(target=keepAlive, args=(conn,))
         t = threading.Thread(target=playing, args=(p, conn,))
         ka.start()
         try:
@@ -67,7 +60,13 @@ def run():
 
 
 
-
+if __name__ == "__main__":
+    args = sys.argv
+    port = 3456
+    if(args[2]=="--port"):
+        if int(args[3]) in range(1000,10000):
+            port = int(args[3])
+    run(port)
 
 
 
