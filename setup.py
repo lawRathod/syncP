@@ -20,7 +20,7 @@ dependency_links = [x.strip().replace('git+', '') for x in all_reqs \
 setup (
   name = 'syncP',
   description = 'A mpv syncing tool among clients and host for local media files',
-  version = '0.1',
+  version = '1',
   packages = find_packages(), # list of all packages
   install_requires = install_requires,
   python_requires='>=3.4',

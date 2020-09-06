@@ -7,7 +7,7 @@ class player:
         self.selected = self.selectMedia()
         self.curr_time = None
 
-    def start(self, conn):
+    def start(self, conns):
         player = self.player
         @player.property_observer('time-pos')
         def time_observer(_name, value):
@@ -15,24 +15,33 @@ class player:
 
         @player.on_key_press("q")
         def on_quit():
-            conn.send("quit".encode())
+            cur = conns.head
+            while cur:
+                cur.conn.send("quit".encode())
+                cur = cur.next
             self.quit()
 
         @player.on_key_press("space")
         def on_toggle():
-            conn.send("toggle".encode())
+            cur = conns.head
+            while cur:
+                cur.conn.send("toggle".encode())
+                cur = cur.next
             self.toggle()
 
 
         @player.on_key_press("s")
         def on_sync():
+            cur = conns.head
             payload = "sync: "+str(self.curr_time)
-            conn.send(payload.encode())
-
+            while cur:
+                cur.conn.send(payload.encode())
+                cur = cur.next
 
         os.system('cls' if os.name == 'nt' else 'clear')
         print("Now Playing \n"+os.path.basename(self.selected)+"...")
         self.player.play(self.selected)
+        self.pause()
         self.player.wait_for_playback()
 
 
@@ -41,6 +50,9 @@ class player:
 
     def toggle(self):
         self.player.cycle("pause")
+
+    def pause(self):
+        self.player.command("set","pause", "yes")
 
     def selectMedia(self):
         os.system('cls' if os.name == 'nt' else 'clear')

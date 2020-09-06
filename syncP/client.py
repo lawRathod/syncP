@@ -1,9 +1,10 @@
 import threading
 import os
+import sys
 import socket
 import inspect
 from syncP.player import player
-
+from syncP.host import node, list
 
 class sock:
     def __init__(self, port, host):
@@ -16,9 +17,10 @@ class sock:
             print("socket created")
             s.connect((self.host, self.port))
             print(s.recv(1024).decode())
+            s.send("veryVeryverySecretString".encode())
             return s
         except Exception as e:
-            print(e)
+            raise e
 
 def playing(p, conn):
     print("thread created successfullyy")
@@ -26,11 +28,13 @@ def playing(p, conn):
         data = conn.recv(1024).decode()
         if data=="toggle":
             p.toggle()
+        elif data=="pause":
+            p.pause()
+        elif data.find("sync: ") == 0:
+            p.player.seek(data[6:],reference="absolute")
         elif data=="":
             p.quit()
             break
-        elif data.find("sync: ") == 0:
-            p.player.seek(data[6:],reference="absolute")
 
     print("thread completed")
 
@@ -79,16 +83,24 @@ def run():
     try:
         p = player()
         s = sock(port, host)
+        conns_list = list()
         conn = s.start()
         if conn==None:
             raise EOFError
+
+        temp = node(conn)
+        conns_list.append(temp)
+
         t = threading.Thread(target=playing, args=(p, conn,))
+
         try:
             t.start()
-            p.start(conn)
+            p.start(conns_list)
         except Exception as e:
             raise e
-        conn.close()
+
+        conns_list.head.conn.close()
+        sys.exit()
         print("App Closed!")
     except Exception as e:
         raise e
