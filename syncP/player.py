@@ -35,9 +35,9 @@ class player:
 
         print("\n--------------------------------\n")
         print("\nNow Playing \n"+os.path.basename(self.selected)+"...")
-        print("\n\n\t\t####################\n")
-        print("\t\tKeyboard shortcuts~\n", "\t\t<space>    -toggle play/pause","\t\ts    -sync all clients (only host)" ,"\t\tq    -quit", sep="\n")
-        print("\n\n\t\t####################")
+        print("\n\n####################\n")
+        print("Keyboard shortcuts~\n", "\t\t<space>    -toggle play/pause","\t\ts    -sync all clients (only host)" ,"\t\tq    -quit", sep="\n")
+        print("\n\n###################\n\n")
         self.player.play(self.selected)
         self.pause()
         if payload != None:

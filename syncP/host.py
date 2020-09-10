@@ -60,10 +60,10 @@ class sock:
             s = socket.socket()
             s.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            print("socket created")
+            print("\nSocket created")
             s.bind(('', self.port))
             s.listen(10)
-            print("socket binded")
+            print("Socket binded\n")
             return s
 
         except Exception as e:
@@ -73,7 +73,7 @@ class sock:
     def start(self, s, p):
         try:
             print("\nSocket listening on port "+str(self.port))
-            print("Waiting for connection")
+            print("\nWaiting for connection")
             c, addr = s.accept()
             # print('Got connection from', addr, c.type, c.proto, c.family)
             c.send(("sync: "+str(p.player.time_pos)).encode())
