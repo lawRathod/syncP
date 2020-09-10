@@ -3,15 +3,14 @@ from syncP import mpv
 
 class player:
     def __init__(self):
-        self.player = mpv.MPV(ytdl=True, input_default_bindings=True, input_vo_keyboard=True)
+        self.player = mpv.MPV(ytdl=True, input_default_bindings=True, input_vo_keyboard=True, osc=True)
         self.selected = self.selectMedia()
-        self.curr_time = None
+        os.system('cls' if os.name == 'nt' else 'clear')
+        self.conns = None
 
-    def start(self, conns):
+    def start(self, conns, payload=None):
         player = self.player
-        @player.property_observer('time-pos')
-        def time_observer(_name, value):
-            self.curr_time = value
+        self.conns = conns
 
         @player.on_key_press("q")
         def on_quit():
@@ -32,18 +31,28 @@ class player:
 
         @player.on_key_press("s")
         def on_sync():
-            cur = conns.head
-            payload = "sync: "+str(self.curr_time)
-            while cur:
-                cur.conn.send(payload.encode())
-                cur = cur.next
+            self.sync()
 
-        os.system('cls' if os.name == 'nt' else 'clear')
-        print("Now Playing \n"+os.path.basename(self.selected)+"...")
+        print("\n--------------------------------\n")
+        print("\nNow Playing \n"+os.path.basename(self.selected)+"...")
+        print("\n\n\t\t####################\n")
+        print("\t\tKeyboard shortcuts~\n", "\t\t<space>    -toggle play/pause","\t\ts    -sync all clients (only host)" ,"\t\tq    -quit", sep="\n")
+        print("\n\n\t\t####################")
         self.player.play(self.selected)
         self.pause()
+        if payload != None:
+            while self.player.time_pos == None:
+                continue
+            self.player.seek(payload[6:],reference="absolute")
         self.player.wait_for_playback()
 
+
+    def sync(self):
+        cur = self.conns.head
+        payload = "sync: "+str(self.player.time_pos)
+        while cur:
+            cur.conn.send(payload.encode())
+            cur = cur.next
 
     def quit(self):
         self.player.quit()

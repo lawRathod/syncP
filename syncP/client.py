@@ -16,11 +16,11 @@ class sock:
             s = socket.socket()
             print("socket created")
             s.connect((self.host, self.port))
-            print(s.recv(1024).decode())
+            payload = s.recv(1024).decode()
             s.send("veryVeryverySecretString".encode())
-            return s
+            return (s, payload)
         except Exception as e:
-            raise e
+            print(e)
 
 def playing(p, conn):
     print("thread created successfullyy")
@@ -32,11 +32,11 @@ def playing(p, conn):
             p.pause()
         elif data.find("sync: ") == 0:
             p.player.seek(data[6:],reference="absolute")
-        elif data=="":
+        elif data=="" or data=="quit":
             p.quit()
             break
 
-    print("thread completed")
+    print("\nPlayer Close!")
 
 def config():
     own_path=inspect.getfile(player)[:-9]
@@ -84,7 +84,7 @@ def run():
         p = player()
         s = sock(port, host)
         conns_list = list()
-        conn = s.start()
+        conn, payload = s.start()
         if conn==None:
             raise EOFError
 
@@ -95,15 +95,15 @@ def run():
 
         try:
             t.start()
-            p.start(conns_list)
+            p.start(conns_list, payload)
         except Exception as e:
-            raise e
+            print(e)
 
         conns_list.head.conn.close()
         sys.exit()
         print("App Closed!")
     except Exception as e:
-        raise e
+        print(e)
 
 if __name__ == "__main__":
     run()

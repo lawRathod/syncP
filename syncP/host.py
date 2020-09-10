@@ -67,19 +67,19 @@ class sock:
             return s
 
         except Exception as e:
-            raise e
+            print(e)
 
 
-    def start(self, s):
+    def start(self, s, p):
         try:
-            print("socket listening on port "+str(self.port))
+            print("\nSocket listening on port "+str(self.port))
             print("Waiting for connection")
             c, addr = s.accept()
-            print('Got connection from', addr, c.type, c.proto, c.family)
-            c.send("Connected".encode())
+            # print('Got connection from', addr, c.type, c.proto, c.family)
+            c.send(("sync: "+str(p.player.time_pos)).encode())
             return c
         except Exception as e:
-            raise e
+            print(e)
 
 
 
@@ -101,10 +101,10 @@ def now_playing(p, conn, conns_list):
                     cur.conn.send("pause".encode())
                 cur = cur.next
             p.pause()
-        elif data=="":
+        elif data=="" or data=="quit":
             try:
                 conns_list.remove(conn)
-                print("node removed")
+                print("Cliend Disconnected")
             except Exception as e:
                 print(e)
             p.pause()
@@ -115,11 +115,11 @@ def now_playing(p, conn, conns_list):
                 cur = cur.next
             break
 
-    print("thread completed")
 
 def get_connections(s, socket, conns, limit, p):
+    print("Limit of connections set to ", str(limit))
     for _ in range(limit):
-        conn = s.start(socket)
+        conn = s.start(socket, p)
         p.pause()
         cur = conns.head
         while cur:
@@ -127,22 +127,23 @@ def get_connections(s, socket, conns, limit, p):
             cur = cur.next
         temp = node(conn)
         conns.append(temp)
+        print("\nNew client joined\n")
         try:
             threading.Thread(target=now_playing, args=(p, conn, conns)).start()
         except Exception as e:
-            raise e
+            print(e)
 
-def run(port=3456):
+def run(port, limit):
     try:
         conns_list = list()
         p = player()
         s = sock(port)
         socket = s.get_socket()
-        collect_connections_thread = threading.Thread(target=get_connections, args=(s, socket,conns_list,10, p,))
+        collect_connections_thread = threading.Thread(target=get_connections, args=(s, socket,conns_list, limit, p,))
         try:
             collect_connections_thread.start()
         except Exception as e:
-            raise e
+            print(e)
         p.start(conns_list)
         curr = conns_list.head
         while curr:
@@ -152,19 +153,27 @@ def run(port=3456):
         sys.exit()
         print("App Closed!")
     except Exception as e:
-        raise e
+        print(e)
 
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Start host script")
-    port = 3456
     parser.add_argument("--port", help="Specifying port, default 3456", type=int)
+    parser.add_argument("--limit", help="Specifying limit of clients, dafault 5", type=int)
     args = parser.parse_args()
-    if(args.port):
-        if args.port in range(1000,10000):
-            port = args.port
-    run(port)
+
+    port = args.port if args.port else 3456
+    limit = args.limit if args.limit else 5
+
+    run(port, limit)
+
+
+
+
+
+
+
 
 
 
