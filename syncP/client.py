@@ -6,11 +6,17 @@ import inspect
 from syncP.player import player
 from syncP.host import node, list
 
+# socket class to instantiate socket connection and start accepting new connections to the socker
 class sock:
+
+    # Specifying the host url and port input at runtime or from file
+    # Params: Port, host
     def __init__(self, port, host):
         self.port = int(port)
         self.host = host
 
+    # Connecting to a socket using the host url and port 
+    # Params: None
     def start(self):
         try:
             s = socket.socket()
@@ -22,6 +28,8 @@ class sock:
         except Exception as e:
             print(e)
 
+# Playing is spawned in a new thread to listen for incoming messages from host
+# Params: player object, connection
 def playing(p, conn):
     print("thread created successfullyy")
     while 1:
@@ -38,6 +46,8 @@ def playing(p, conn):
 
     print("\nPlayer Close!")
 
+# Config method to get host and port for connection at runtime of prev stored file
+# The host and port are written to a file everytime a input is used
 def config():
     own_path=inspect.getfile(player)[:-9]
     config_path = os.path.join(own_path, 'config')
@@ -77,7 +87,7 @@ def config():
 
     return (host, port)
 
-
+# Run methos is called by the entry method to orchestrate the entire client script
 def run():
     host, port = config()
     try:
@@ -105,6 +115,7 @@ def run():
     except Exception as e:
         print(e)
 
+# Entry point if the script is called separately
 if __name__ == "__main__":
     run()
 

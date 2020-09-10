@@ -5,16 +5,19 @@ import threading
 from syncP.player import player
 import sys
 
+# node struct for linked list, param: connection
 class node:
     def __init__(self, conn):
         self.next = None
         self.conn =  conn
 
+# linked list implementation and routines, maintaining end and head
 class list:
     def __init__(self):
         self.head = None
         self.end = None
 
+    # Append method to add node to the end of the list
     def append(self, node):
         if self.end == None and self.head == None:
             self.head = node
@@ -23,6 +26,7 @@ class list:
             self.end.next = node
             self.end = node
 
+    # Remove method to search the connectiont to remove and remove from the list
     def remove(self, conn):
         cur = self.head
         if conn == cur.conn:
@@ -50,11 +54,14 @@ class list:
 
 
 
-
+# socket class to instantiate socket connection and start accepting new connections to the socker
 class sock:
+
+    # Specifying port to use for binding the socket
     def __init__(self, port):
         self.port = port
 
+    # Get socket binds socket to a port and return the socket
     def get_socket(self):
         try:
             s = socket.socket()
@@ -69,7 +76,7 @@ class sock:
         except Exception as e:
             print(e)
 
-
+    # Start starts a new connection and returns the connections object
     def start(self, s, p):
         try:
             print("\nSocket listening on port "+str(self.port))
@@ -82,7 +89,7 @@ class sock:
             print(e)
 
 
-
+# Now playing accepts connection and the connections list, spawned for every connection and listens for messages 
 def now_playing(p, conn, conns_list):
     print("thread created successfuly")
     while 1:
@@ -116,6 +123,8 @@ def now_playing(p, conn, conns_list):
             break
 
 
+# Get Connection runs in a separate thread and listens for new connection until the limit of connection is over
+# Params: sock class object, socket binded to the port by the sock class, limit (default: 5) of connection, player object
 def get_connections(s, socket, conns, limit, p):
     print("Limit of connections set to ", str(limit))
     for _ in range(limit):
@@ -133,6 +142,8 @@ def get_connections(s, socket, conns, limit, p):
         except Exception as e:
             print(e)
 
+# Run is the parent method called in the very beginning to orchestrate everything
+# Params: Port specified on cli, limit specified on cli or defaults 3456 and 5
 def run(port, limit):
     try:
         conns_list = list()
@@ -157,6 +168,7 @@ def run(port, limit):
 
 
 
+# Entry if script called separately
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Start host script")
     parser.add_argument("--port", help="Specifying port, default 3456", type=int)
