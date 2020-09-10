@@ -26,6 +26,7 @@ Install the wheel package manually by downloading it from [releases](https://git
 [For Host]
 - Navigate to the directory with your media file you wanna sync and run **syncp host**. Follow the instructions on the terminal and this will open a port on your system for communication.
 - You will need to port forward using [ngrok](https://ngrok.com/) or config your router, I would suggest use [ngrok](https://ngrok.com/) tcp feature for this purpose.
+- Optionally you can specify port and limit for number of clients you want to add using the options **--limit** and **--port**. The default port is 3456 and limit is 5. Example: **syncp host --port 1234 --limit 20**
 
 [For Client]
 - Nagigate to the directory with your media file you wanna sync and run **syncp client**. Follow the instructions where it will ask you for the host url and port.
