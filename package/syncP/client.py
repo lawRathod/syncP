@@ -1,6 +1,7 @@
 import threading
 import os
 import sys
+import time
 import socket
 import inspect
 from syncP.player import player
@@ -45,6 +46,13 @@ def playing(p, conn):
             break
 
     print("\nPlayer Close!")
+
+
+def keep_alive(conn):
+    while True:
+        conn.send("KeepAlive".encode())
+        time.sleep(200)
+
 
 # Config method to get host and port for connection at runtime of prev stored file
 # The host and port are written to a file everytime a input is used
@@ -102,9 +110,11 @@ def run():
         conns_list.append(temp)
 
         t = threading.Thread(target=playing, args=(p, conn,))
+        ka = threading.Thread(target=keep_alive, args=(conn,))
 
         try:
             t.start()
+            ka.start()
             p.start(conns_list, payload)
         except Exception as e:
             print(e)
