@@ -53,6 +53,20 @@ def keep_alive(conn):
         conn.send("KeepAlive".encode())
         time.sleep(200)
 
+def prompt_for_new_config():
+    own_path=inspect.getfile(player)[:-9]
+    config_path = os.path.join(own_path, 'config')
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print("Enter url: ")
+    url = input().split(':')
+    host = url[0]
+    port = int(url[1])
+
+    with open(config_path, 'w') as f:
+        f.write(host+"~"+str(port))
+
+    return host, port
+
 
 # Config method to get host and port for connection at runtime of prev stored file
 # The host and port are written to a file everytime a input is used
@@ -74,28 +88,14 @@ def config():
         if s=="" or s=="y":
             host, port = temp[0], temp[1]
         else:
-            os.system('cls' if os.name == 'nt' else 'clear')
-            print("Enter host url: ")
-            host = input()
-            print("Enter Port: ")
-            port = int(input())
-
-            with open(config_path, 'w') as f:
-                f.write(host+"~"+str(port))
+            host, port = prompt_for_new_config()
     else:
-        os.system('cls' if os.name == 'nt' else 'clear')
-        print("Enter host url: ")
-        host = input()
-        print("Enter Port: ")
-        port = int(input())
-
-        with open(config_path, 'w') as f:
-            f.write(host+"~"+str(port))
+        host, port = prompt_for_new_config()
 
 
     return (host, port)
 
-# Run methos is called by the entry method to orchestrate the entire client script
+# Run method is called by the entry method to orchestrate the entire client script
 def run():
     host, port = config()
     try:
